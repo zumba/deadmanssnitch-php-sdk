@@ -71,6 +71,9 @@ class Client implements LoggerAwareInterface
             'json' => $snitchBody
         ]);
         if ($response->getStatusCode() !== 200) {
+            $this->logger->error('Unable to create snitch.', [
+                'snitch' => $snitchBody
+            ]);
             $this->handleError($response);
         }
         $body = json_decode($response->getBody(), true);
@@ -89,14 +92,12 @@ class Client implements LoggerAwareInterface
     private function handleError(ResponseInterface $response)
     {
         $body = json_decode($response->getBody(), true);
-        $this->logger->error('Unable to create snitch.', [
-            'error' => $body,
-            'snitch' => $snitchBody
-        ]);
         $errorType = isset($body['type']) ? $body['type'] : $response->getStatusCode();
-        throw new ResponseError(
+        $e = new ResponseError(
             sprintf('%s: %s', $errorType, $body['error']),
             $response->getStatusCode()
         );
+        $this->logger->error($e->getMessage());
+        throw $e;
     }
 }
