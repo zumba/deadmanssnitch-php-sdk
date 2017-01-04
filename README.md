@@ -2,7 +2,20 @@
 
 This library allows for easy access to [Deadmanssnitch](https://deadmanssnitch.com/)'s API.
 
-## Example Use
+You can use it to manage snitches through the API or to notify a snitch when a process completes.
+
+## Example Notifier use
+
+```php
+<?php
+
+use Zumba\Deadmanssnitch\Notifier;
+
+$notifier = new Notifier();
+$notifier->pingSnitch('snitch id', 'just checking in.');
+```
+
+## Example API Use
 
 ```php
 <?php
