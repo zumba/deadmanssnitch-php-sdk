@@ -58,8 +58,7 @@ class Notifier implements LoggerAwareInterface
             ]
         ];
         $response = $this->client->request('GET', "/$token", $options);
-        if ($response->getStatusCode() !== 202)
-        {
+        if ($response->getStatusCode() !== 202) {
             $this->logger->error('Failed to ping snitch.');
         }
     }
