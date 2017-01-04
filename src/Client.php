@@ -38,6 +38,7 @@ class Client implements LoggerAwareInterface
      * @param string $apiKey
      * @param \GuzzleHttp\ClientInterface $client
      * @param \Psr\Log\LoggerInterface $logger
+     * @throws \RuntimeException
      */
     public function __construct(
         $apiKey,
