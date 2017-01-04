@@ -2,4 +2,7 @@
 
 namespace Zumba\Deadmanssnitch;
 
-class ResponseError extends \Exception{}
+class ResponseError extends \Exception
+{
+
+}

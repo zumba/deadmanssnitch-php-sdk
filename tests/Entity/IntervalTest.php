@@ -1,5 +1,7 @@
 <?php
 
+namespace Zumba\Deadmanssnitch\Test\Entity;
+
 use PHPUnit\Framework\TestCase;
 use Zumba\Deadmanssnitch\Entity\Interval;
 

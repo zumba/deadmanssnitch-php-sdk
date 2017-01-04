@@ -1,5 +1,7 @@
 <?php
 
+namespace Zumba\Deadmanssnitch\Test;
+
 use PHPUnit\Framework\TestCase;
 use Zumba\Deadmanssnitch\Client;
 use GuzzleHttp\Client as GuzzleClient;

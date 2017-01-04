@@ -86,7 +86,8 @@ class Client implements LoggerAwareInterface
      * @return void
      * @throws \Zumba\Deadmanssnitch\ResponseError
      */
-    private function handleError(ResponseInterface $response) {
+    private function handleError(ResponseInterface $response)
+    {
         $body = json_decode($response->getBody(), true);
         $this->logger->error('Unable to create snitch.', [
             'error' => $body,
@@ -94,7 +95,7 @@ class Client implements LoggerAwareInterface
         ]);
         $errorType = isset($body['type']) ? $body['type'] : $response->getStatusCode();
         throw new ResponseError(
-            sprintf('%s: %s', $errorType , $body['error']),
+            sprintf('%s: %s', $errorType, $body['error']),
             $response->getStatusCode()
         );
     }
