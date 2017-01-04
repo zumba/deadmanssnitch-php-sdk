@@ -42,7 +42,7 @@ composer update
 
 The SDK currently supports `v1` of DMS's API.
 
-* [Creating a snitch](https://deadmanssnitch.com/docs/api/v1#creating-a-snitch)
+* [Creating a snitch](https://deadmanssnitch.com/docs/api/v1#creating-a-snitch) - `Client::createSnitch(Snitch $snitch): void`
 * Listing snitches (Not implemented yet)
 * Examining snitches (Not implemented yet)
 * Editing a snitch (Not implemented yet)
