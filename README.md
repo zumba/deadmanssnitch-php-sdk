@@ -53,6 +53,8 @@ composer update
 
 ## Supported APIs
 
+Supports pinging the `nosnch.in` domain for a specific snitch. See `Notifier::pingSnitch(string $token, string $message = ''): void`.
+
 The SDK currently supports `v1` of DMS's API.
 
 * [Creating a snitch](https://deadmanssnitch.com/docs/api/v1#creating-a-snitch) - `Client::createSnitch(Snitch $snitch): void`
