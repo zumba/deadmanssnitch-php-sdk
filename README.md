@@ -15,7 +15,9 @@ use Zumba\Deadmanssnitch\ResponseError;
 $client = new Client('your api key here');
 
 // creating a snitch
-$snitch = new Snitch('My cool process', new Interval(Interval::I_DAILY));
+$snitch = new Snitch('My cool process', new Interval(Interval::I_DAILY), [
+    'tags' => ['production', 'critical']
+]);
 try {
     $client->createSnitch($snitch);
 } catch (ResponseError $e) {
