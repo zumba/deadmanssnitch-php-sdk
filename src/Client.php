@@ -58,6 +58,46 @@ class Client implements LoggerAwareInterface
     }
 
     /**
+     * Get a list of all snitches.
+     *
+     * @param array $tags Optional filter by tags.
+     * @return array []\Zumba\Deadmanssnitch\Entity\Snitch
+     * @throws \Zumba\Deadmanssnitch\ResponseError
+     */
+    public function listSnitches(array $tags = [])
+    {
+        $response = $this->client->request('GET', '/v1/snitches', [
+            'query' => !empty($tags) ? compact('tags') : []
+        ]);
+        if ($response->getStatusCode() !== 200) {
+            $this->logger->error('Unable to list snitches.', compact('tags'));
+            $this->handleError($response);
+        }
+        $snitches = [];
+        foreach (json_decode($response->getBody(), true) as $entry) {
+            $snitches[] = new Snitch($entry['name'], new Interval($entry['interval']), $entry);
+        }
+        return $snitches;
+    }
+
+    /**
+     * Get a detailed view of a specific snitch by token.
+     *
+     * @param string $token
+     * @return \Zumba\Deadmanssnitch\Entity\Snitch
+     */
+    public function examineSnitch($token)
+    {
+        $response = $this->client->request('GET', "/v1/snitches/$token");
+        if ($response->getStatusCode() !== 200) {
+            $this->logger->error('Unable to find snitch.', compact('token'));
+            $this->handleError($response);
+        }
+        $snitch = json_decode($response->getBody(), true);
+        return new Snitch($entry['name'], new Interval($entry['interval']), $entry);
+    }
+
+    /**
      * Create a snitch.
      *
      * @param \Zumba\Deadmanssnitch\Entity\Snitch $snitch
@@ -66,7 +106,7 @@ class Client implements LoggerAwareInterface
      */
     public function createSnitch(Snitch $snitch)
     {
-        $snitchBody = $snitch->data();
+        $snitchBody = $snitch->toArray();
         $this->logger->debug('Creating snitch.', $snitchBody);
         $response = $this->client->request('POST', '/v1/snitches', [
             'json' => $snitchBody
@@ -78,9 +118,112 @@ class Client implements LoggerAwareInterface
             $this->handleError($response);
         }
         $body = json_decode($response->getBody(), true);
-        $snitch->setToken($body['token']);
-        $snitch->setHref($body['href']);
-        $snitch->setStatus($body['status']);
+        $snitch->token = $body['token'];
+    }
+
+    /**
+     * Edit a snitch.
+     *
+     * Example usage:
+     *   $snitch = $client->examineSnitch($token);
+     *   $snitch->notes = 'Some informative notes.';
+     *   $client->editSnitch($snitch);
+     *
+     * Please note, that this will overwrite any value you modify.
+     * If you want to append/remove tags, use Client::appendTags()/removeTag() respective.
+     *
+     * If the snitch has not been previously created (ie doesn't have a token),
+     * it will be created.
+     *
+     * @param \Zumba\Deadmanssnitch\Entity\Snitch
+     * @return void
+     * @throws \Zumba\Deadmanssnitch\ResponseError
+     */
+    public function editSnitch(Snitch $snitch)
+    {
+        if ($snitch->isNew()) {
+            $this->createSnitch($snitch);
+            return;
+        }
+        $candidateValues = $snitch->extract($snitch->visibleProperties(), true);
+        if (isset($candidateValues['interval'])) {
+            $candidateValues['interval'] = (string)$candidateValues['interval'];
+        }
+        $response = $this->client->request('PATCH', "/v1/snitches/$snitch", [
+            'json' => $candidateValues
+        ]);
+        if ($response->getStatusCode() !== 200) {
+            $this->logger->error('Unable to edit snitch.', compact('candidateValues'));
+            $this->handleError($response);
+        }
+    }
+
+    /**
+     * Append tags to a snitch.
+     *
+     * @param string $token
+     * @param array $tags
+     * @return void
+     * @throws \Zumba\Deadmanssnitch\ResponseError
+     */
+    public function appendTags($token, array $tags)
+    {
+        $response = $this->client->request('POST', "/v1/snitches/$token/tags", [
+            'json' => $tags
+        ]);
+        if ($response->getStatusCode() !== 200) {
+            $this->logger->error('Unable to append tags to snitch.', compact('tags'));
+            $this->handleError($response);
+        }
+    }
+
+    /**
+     * Remove a tag from a snitch.
+     *
+     * @param string $token
+     * @param string $tag
+     * @return void
+     * @throws \Zumba\Deadmanssnitch\ResponseError
+     */
+    public function removeTag($token, $tag)
+    {
+        $response = $this->client->request('DELETE', "/v1/snitches/$token/tags/$tag");
+        if ($response->getStatusCode() !== 200) {
+            $this->logger->error('Unable to append tags to snitch.', compact('tags'));
+            $this->handleError($response);
+        }
+    }
+
+    /**
+     * Pause snitch.
+     *
+     * @param string $token
+     * @return void
+     * @throws \Zumba\Deadmanssnitch\ResponseError
+     */
+    public function pauseSnitch($token)
+    {
+        $response = $this->client->request('POST', "/v1/snitches/$token/pause");
+        if ($response->getStatusCode() !== 204) {
+            $this->logger->error('Unable to pause snitch.', compact('token'));
+            $this->handleError($response);
+        }
+    }
+
+    /**
+     * Delete a snitch.
+     *
+     * @param string $token
+     * @return void
+     * @throws \Zumba\Deadmanssnitch\ResponseError
+     */
+    public function deleteSnitch($token)
+    {
+        $response = $this->client->request('DELETE', "/v1/snitches/$token");
+        if ($response->getStatusCode() !== 204) {
+            $this->logger->error('Unable to delete snitch.', compact('token'));
+            $this->handleError($response);
+        }
     }
 
     /**
