@@ -66,30 +66,40 @@ class Snitch implements EntityInterface
         }
     }
 
+    // @codingStandardsIgnoreStart
     protected function _setToken($token)
     {
+        // @codingStandardsIgnoreEnd
         $this->isNew(false);
         $this->_accessible['token'] = false;
         return $token;
     }
 
+    // @codingStandardsIgnoreStart
     protected function _setCheckedInAt($checkedInAt)
     {
+        // @codingStandardsIgnoreEnd
         return new \DateTime($checkedInAt);
     }
 
+    // @codingStandardsIgnoreStart
     protected function _setCreatedAt($createdAt)
     {
+        // @codingStandardsIgnoreEnd
         return new \DateTime($createdAt);
     }
 
+    // @codingStandardsIgnoreStart
     protected function _setTags($tags)
     {
+        // @codingStandardsIgnoreEnd
         return (array)$tags;
     }
 
+    // @codingStandardsIgnoreStart
     protected function _setInterval(Interval $interval)
     {
+        // @codingStandardsIgnoreEnd
         return $interval;
     }
 
