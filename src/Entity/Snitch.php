@@ -2,9 +2,24 @@
 
 namespace Zumba\Deadmanssnitch\Entity;
 
-class Snitch
+use Cake\Datasource\EntityInterface;
+use Cake\Datasource\EntityTrait;
+
+class Snitch implements EntityInterface
 {
-    private $data;
+    use EntityTrait {
+        jsonSerialize as private entityTraitJsonSerialize;
+        toArray as private entityTraitToArray;
+        set as private entityTraitSet;
+    }
+
+    private $toBeUnaccessible = [
+        'href',
+        'status',
+        'checked_in_at',
+        'created_at',
+        'check_in_url',
+    ];
 
     /**
      * Constructor.
@@ -15,55 +30,81 @@ class Snitch
      */
     public function __construct($name, Interval $interval, array $options = [])
     {
-        $this->data = [
-            'name' => $name,
-            'interval' => (string)$interval
-        ] + $options;
+        $this->_accessible = array_fill_keys($this->toBeUnaccessible, true) + [
+            'token' => true,
+            'name' => true,
+            'interval' => true,
+            'tags' => true,
+            'alert_type' => true,
+            'notes' => true,
+        ];
+        $this->_hidden = [
+            'token',
+            'href',
+            'status',
+            'checked_in_at',
+            'created_at',
+            'check_in_url',
+        ];
+        $this->set(compact('name', 'interval') + $options);
+        $this->_accessible = array_merge(
+            $this->_accessible,
+            array_fill_keys($this->toBeUnaccessible, false)
+        );
+        foreach ($this->toBeUnaccessible as $field) {
+            $this->accessible($field, false);
+        }
+        $this->clean();
     }
 
-    /**
-     * Get the data of this snitch
-     *
-     * @return array
-     */
-    public function data()
+    public function set($property, $value = null, array $options = [])
     {
-        return $this->data;
+        if (is_string($property) && $property !== '') {
+            $this->entityTraitSet([$property => $value], ['guard' => true] + $options);
+        } else {
+            $this->entityTraitSet($property, $value, ['guard' => true] + $options);
+        }
     }
 
-    /**
-     * Set the token for this snitch.
-     *
-     * @param string $token
-     * @return void
-     */
-    public function setToken($token)
+    protected function _setToken($token)
     {
-        $this->data['token'] = $token;
+        $this->isNew(false);
+        $this->_accessible['token'] = false;
+        return $token;
     }
 
-    /**
-     * Set the status for this snitch.
-     *
-     * @param string $status
-     * @return void
-     */
-    public function setStatus($status)
+    protected function _setCheckedInAt($checkedInAt)
     {
-        $this->data['status'] = $status;
+        return new \DateTime($checkedInAt);
     }
 
-    /**
-     * Set the href for this snitch.
-     *
-     * This is useful for get requests of this snitch.
-     *
-     * @param string $token
-     * @return void
-     */
-    public function setHref($href)
+    protected function _setCreatedAt($createdAt)
     {
-        $this->data['href'] = $href;
+        return new \DateTime($createdAt);
+    }
+
+    protected function _setTags($tags)
+    {
+        return (array)$tags;
+    }
+
+    protected function _setInterval(Interval $interval)
+    {
+        return $interval;
+    }
+
+    public function toArray()
+    {
+        return [
+            'interval' => (string)$this->interval
+        ] + $this->entityTraitToArray();
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'interval' => (string)$this->interval
+        ] + $this->entityTraitJsonSerialize();
     }
 
     /**
@@ -73,6 +114,6 @@ class Snitch
      */
     public function __toString()
     {
-        return !empty($this->data['token']) ? $this->data['token'] : '';
+        return $this->token ?: '';
     }
 }
