@@ -44,11 +44,8 @@ echo $snitch;
 
 ## Installation
 
-* With Composer
-
 ```bash
 composer require zumba/deadmanssnitch-sdk
-composer update
 ```
 
 ## Supported APIs
@@ -58,13 +55,16 @@ Supports pinging the `nosnch.in` domain for a specific snitch. See `Notifier::pi
 The SDK currently supports `v1` of DMS's API.
 
 * [Creating a snitch](https://deadmanssnitch.com/docs/api/v1#creating-a-snitch) - `Client::createSnitch(Snitch $snitch): void`
-* Listing snitches (Not implemented yet)
-* Examining snitches (Not implemented yet)
-* Editing a snitch (Not implemented yet)
-* Pausing a snitch (Not implemented yet)
-* Deleting a snitch (Not implemented yet)
+* [Listing snitches](https://deadmanssnitch.com/docs/api/v1#listing-your-snitches) - `Client::listSnitches(array $tags = []): []Snitch`
+  * Includes ability to filter by tags
+* [Examining snitches](https://deadmanssnitch.com/docs/api/v1#examining-a-snitch) - `Client::examineSnitch(string $token): Snitch`
+* [Editing a snitch](https://deadmanssnitch.com/docs/api/v1#editing-a-snitch) - `Client::editSnitch(Snitch $snitch): void`
+  * Also supports appending tags and removing a single tag (per the API).
+  * Setting tags on a snitch and using edit will replace the tags with what is provided.
+* [Pausing a snitch](https://deadmanssnitch.com/docs/api/v1#pausing-a-snitch) - `Client::pauseSnitch(string $token): void`
+* [Deleting a snitch](https://deadmanssnitch.com/docs/api/v1#deleting-a-snitch) - `Client::removeSnitch(string $token): void`
 
-Note, we will never support attaining an API key with username/password.
+Note, we will not support attaining an API key with username/password.
 
 ## Advanced usage
 
@@ -80,7 +80,7 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
 $http = new GuzzleClient([
-    'base_uri' => static::HOST,
+    'base_uri' => Client::HOST,
     'auth' => ['my api key', '']
 ]);
 
@@ -91,4 +91,6 @@ $client = new Client('my api key', $http, $logger);
 ```
 
 However, please note that guzzle clients are immutable, so you will be responsible
-for setting the base URI and auth parameters.
+for setting the base URI and auth parameters. Internally, `http_errors` is disabled
+in order to wrap and use our own exceptions. If you do not disable this, you will
+need to catch Guzzle exceptions instead of `Zumba\Deadmanssnitch\ResponseError`.
