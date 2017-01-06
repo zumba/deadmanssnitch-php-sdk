@@ -51,9 +51,6 @@ class Snitch implements EntityInterface
             $this->_accessible,
             array_fill_keys($this->toBeUnaccessible, false)
         );
-        foreach ($this->toBeUnaccessible as $field) {
-            $this->accessible($field, false);
-        }
         $this->clean();
     }
 
