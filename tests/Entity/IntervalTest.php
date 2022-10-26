@@ -13,11 +13,9 @@ class IntervalTest extends TestCase
         $this->assertEquals(Interval::I_DAILY, (string)$interval);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInvalidConstruction()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new Interval('some invalid value');
     }
 }

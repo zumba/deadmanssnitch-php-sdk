@@ -145,7 +145,7 @@ class Client implements LoggerAwareInterface
             $this->createSnitch($snitch);
             return;
         }
-        $candidateValues = $snitch->extract($snitch->visibleProperties(), true);
+        $candidateValues = $snitch->extract($snitch->getVisible(), true);
         if (isset($candidateValues['interval'])) {
             $candidateValues['interval'] = (string)$candidateValues['interval'];
         }

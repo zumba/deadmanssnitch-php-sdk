@@ -67,7 +67,7 @@ class Snitch implements EntityInterface
     protected function _setToken($token)
     {
         // @codingStandardsIgnoreEnd
-        $this->isNew(false);
+        $this->setNew(false);
         $this->_accessible['token'] = false;
         return $token;
     }
@@ -100,7 +100,7 @@ class Snitch implements EntityInterface
         return $interval;
     }
 
-    public function toArray()
+    public function toArray() : array
     {
         return [
             'interval' => (string)$this->interval
