@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Middleware;
 use Zumba\Deadmanssnitch\Entity\Snitch;
 use Zumba\Deadmanssnitch\Entity\Interval;
+use Zumba\Deadmanssnitch\ResponseError;
 
 class ClientTest extends TestCase
 {
@@ -133,13 +134,10 @@ class ClientTest extends TestCase
         $this->assertEquals('/v1/snitches/23456', (string)$container[0]['request']->getUri());
     }
 
-    /**
-     * @expectedException \Zumba\Deadmanssnitch\ResponseError
-     * @expectedExceptionMessage error_type: Some error
-     * @expectedExceptionCode 400
-     */
     public function testCreateSnitchError()
     {
+        $this->expectException(ResponseError::class);
+        $this->expectExceptionCode(400);
         $snitch = new Snitch('Some name', new Interval(Interval::I_DAILY));
         $mock = new MockHandler([
             new Response(400, [], json_encode([

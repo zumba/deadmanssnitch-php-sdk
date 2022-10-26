@@ -94,7 +94,7 @@ class Client implements LoggerAwareInterface
             $this->handleError($response);
         }
         $snitch = json_decode($response->getBody(), true);
-        return new Snitch($entry['name'], new Interval($entry['interval']), $entry);
+        return new Snitch($snitch['name'], new Interval($snitch['interval']), $snitch);
     }
 
     /**
@@ -145,7 +145,7 @@ class Client implements LoggerAwareInterface
             $this->createSnitch($snitch);
             return;
         }
-        $candidateValues = $snitch->extract($snitch->visibleProperties(), true);
+        $candidateValues = $snitch->extract($snitch->getVisible(), true);
         if (isset($candidateValues['interval'])) {
             $candidateValues['interval'] = (string)$candidateValues['interval'];
         }
