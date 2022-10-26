@@ -94,7 +94,7 @@ class Client implements LoggerAwareInterface
             $this->handleError($response);
         }
         $snitch = json_decode($response->getBody(), true);
-        return new Snitch($entry['name'], new Interval($entry['interval']), $entry);
+        return new Snitch($snitch['name'], new Interval($snitch['interval']), $snitch);
     }
 
     /**
